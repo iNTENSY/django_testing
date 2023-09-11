@@ -12,6 +12,7 @@ def author(django_user_model):
     user = django_user_model.objects.create(username='Автор')
     return user
 
+
 @pytest.fixture
 def reader(django_user_model):
     return django_user_model.objects.create(username='Читатель')
@@ -78,3 +79,16 @@ def form_data(news):
         'text': 'Новый текст',
         'created': timezone.now()
     }
+
+
+@pytest.fixture
+def two_comments(news, author):
+    comments_list = [Comment(
+        news=news,
+        text='Текст',
+        created=today + timezone.timedelta(days=index),
+        author=author
+    )
+        for index in range(2)]
+    all_comments = Comment.objects.bulk_create(comments_list)
+    return all_comments

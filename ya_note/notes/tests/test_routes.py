@@ -15,7 +15,9 @@ class TestRoutes(TestCase):
     def setUpTestData(cls):
         cls.author = User.objects.create(username='admin')
         cls.reader = User.objects.create(username='reader')
-        cls.note = Note.objects.create(title='Заголовок', text='Текст', author=cls.author)
+        cls.note = Note.objects.create(
+            title='Заголовок', text='Текст', author=cls.author
+        )
 
     def test_redirect_for_anonymous_client(self):
         login_url = reverse('users:login')

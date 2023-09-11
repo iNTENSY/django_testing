@@ -9,7 +9,9 @@ from news.models import Comment
 
 
 @pytest.mark.django_db
-def test_anonymous_user_cant_create_comment(client, form_data, news_pk_for_args):
+def test_anonymous_user_cant_create_comment(client,
+                                            form_data,
+                                            news_pk_for_args):
     url = reverse('news:detail', args=news_pk_for_args)
     response = client.post(url, data=form_data)
     login_url = reverse('users:login')
@@ -38,7 +40,9 @@ def test_user_cant_use_bad_words(admin_client, news_pk_for_args, form_data):
 
 
 @pytest.mark.django_db
-def test_author_cant_edit_comment_using_bad_words(author_client, comment_pk_for_args, form_data):
+def test_author_cant_edit_comment_using_bad_words(author_client,
+                                                  comment_pk_for_args,
+                                                  form_data):
     form_data['text'] = f'А вот если - {BAD_WORDS[0]} так?'
     url = reverse('news:edit', args=comment_pk_for_args)
     response = author_client.post(url, data=form_data)
@@ -48,7 +52,10 @@ def test_author_cant_edit_comment_using_bad_words(author_client, comment_pk_for_
 
 
 @pytest.mark.django_db
-def test_author_can_edit_comment(author_client, news_pk_for_args, comment_pk_for_args, form_data):
+def test_author_can_edit_comment(author_client,
+                                 news_pk_for_args,
+                                 comment_pk_for_args,
+                                 form_data):
     url = reverse('news:edit', args=comment_pk_for_args)
     news_url = reverse('news:detail', args=news_pk_for_args) + '#comments'
     response = author_client.post(url, data=form_data)
@@ -69,7 +76,8 @@ def test_author_can_delete_comment(author_client, comment, news_pk_for_args):
 
 
 @pytest.mark.django_db
-def test_user_cant_delete_comment_of_another_user(reader_client, comment_pk_for_args):
+def test_user_cant_delete_comment_of_another_user(reader_client,
+                                                  comment_pk_for_args):
     url = reverse('news:delete', args=comment_pk_for_args)
     response = reader_client.delete(url)
     assert response.status_code == HTTPStatus.NOT_FOUND
@@ -77,7 +85,9 @@ def test_user_cant_delete_comment_of_another_user(reader_client, comment_pk_for_
 
 
 @pytest.mark.django_db
-def test_user_cant_edit_comment_of_another_user(reader_client, comment, form_data):
+def test_user_cant_edit_comment_of_another_user(reader_client,
+                                                comment,
+                                                form_data):
     url = reverse('news:edit', args=(comment.pk,))
     response = reader_client.post(url, data=form_data)
     assert response.status_code == HTTPStatus.NOT_FOUND

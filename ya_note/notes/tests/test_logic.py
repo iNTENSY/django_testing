@@ -39,7 +39,11 @@ class TestNoteEditDelete(TestCase):
         cls.add_url = reverse('notes:add')
         cls.delete_url = reverse('notes:delete', args=(cls.note.slug,))
 
-        cls.form_data = {'title': cls.NEW_COMMENT_TITLE, 'text': cls.NEW_COMMENT_TEXT, 'slug': 'form-slug'}
+        cls.form_data = {
+            'title': cls.NEW_COMMENT_TITLE,
+            'text': cls.NEW_COMMENT_TEXT,
+            'slug': 'form-slug'
+        }
 
     def test_author_can_edit_note(self):
         response = self.author_client.post(self.edit_url, data=self.form_data)
@@ -70,7 +74,10 @@ class TestNoteEditDelete(TestCase):
         response = self.reader_client.post(
             self.add_url, data=self.form_data
         )
-        self.assertFormError(response, 'form', 'slug', errors=self.note.slug + WARNING)
+        self.assertFormError(response,
+                             'form',
+                             'slug',
+                             errors=self.note.slug + WARNING)
         self.assertEquals(Note.objects.count(), 1)
 
     def test_empty_slug(self):

@@ -7,6 +7,7 @@ from notes.models import Note
 
 User = get_user_model()
 
+
 class TestNote(TestCase):
     @classmethod
     def setUpTestData(cls):

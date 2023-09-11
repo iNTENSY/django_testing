@@ -23,20 +23,27 @@ def test_news_order(eleven_news, client):
     assert all_news == sorted_date
 
 
-
 @pytest.mark.parametrize(
     'parametrized_client, expected_result',
     (
-            (pytest.lazy_fixture('admin_client'), True),
-            (pytest.lazy_fixture('client'), False)
+        (pytest.lazy_fixture('admin_client'), True),
+        (pytest.lazy_fixture('client'), False)
     )
 )
 @pytest.mark.django_db
-def test_form_in_any_users(parametrized_client, expected_result, news_pk_for_args):
+def test_form_in_any_users(parametrized_client,
+                           expected_result,
+                           news_pk_for_args):
     url = reverse('news:detail', args=news_pk_for_args)
     response = parametrized_client.get(url)
     assert ('form' in response.context) is expected_result
 
 
-def test_sorted_comments():
-    pass
+@pytest.mark.django_db
+def test_sorted_comments(admin_client, two_comments, news_pk_for_args):
+    url = reverse('news:detail', args=news_pk_for_args)
+    response = admin_client.get(url)
+    object_list = response.context['news'].comment_set.all()
+    all_comments = [comment.created for comment in object_list]
+    sorted_comments = sorted(all_comments)
+    assert all_comments == sorted_comments
