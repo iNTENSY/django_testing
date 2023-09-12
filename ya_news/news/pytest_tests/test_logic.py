@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 import pytest
+from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertFormError
 
@@ -47,7 +48,7 @@ def test_author_cant_edit_comment_using_bad_words(author_client,
     url = reverse('news:edit', args=comment_pk_for_args)
     response = author_client.post(url, data=form_data)
     assertFormError(response, 'form', 'text', errors=WARNING)
-    comment = Comment.objects.first()
+    comment = Comment.objects.get(pk=comment_pk_for_args[0])
     assert comment.text != form_data['text']
 
 
@@ -61,7 +62,6 @@ def test_author_can_edit_comment(author_client,
     response = author_client.post(url, data=form_data)
     assertRedirects(response, news_url)
     comment = Comment.objects.first()
-    comment.refresh_from_db()
     assert comment.text == form_data['text']
     assert comment.news == form_data['news']
 
@@ -72,12 +72,14 @@ def test_author_can_delete_comment(author_client, comment, news_pk_for_args):
     news_url = reverse('news:detail', args=news_pk_for_args) + '#comments'
     response = author_client.delete(url)
     assertRedirects(response, news_url)
-    assert Comment.objects.count() == 0
+    with pytest.raises(ObjectDoesNotExist):
+        Comment.objects.get(pk=comment.pk)
 
 
 @pytest.mark.django_db
 def test_user_cant_delete_comment_of_another_user(reader_client,
                                                   comment_pk_for_args):
+    assert Comment.objects.count() == 0
     url = reverse('news:delete', args=comment_pk_for_args)
     response = reader_client.delete(url)
     assert response.status_code == HTTPStatus.NOT_FOUND
