@@ -79,7 +79,7 @@ def test_author_can_delete_comment(author_client, comment, news_pk_for_args):
 @pytest.mark.django_db
 def test_user_cant_delete_comment_of_another_user(reader_client,
                                                   comment_pk_for_args):
-    assert Comment.objects.count() == 0
+    assert Comment.objects.count() == 1
     url = reverse('news:delete', args=comment_pk_for_args)
     response = reader_client.delete(url)
     assert response.status_code == HTTPStatus.NOT_FOUND

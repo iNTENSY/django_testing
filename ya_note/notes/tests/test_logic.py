@@ -93,6 +93,10 @@ class TestNoteEditDelete(TestCase):
         response = self.reader_client.post(self.add_url, data=self.form_data)
         self.assertRedirects(response, reverse('notes:success'))
         self.assertEquals(Note.objects.count(), 2)
+        note = Note.objects.get(slug=self.form_data['slug'])
+        self.assertEquals(note.text, self.form_data['text'])
+        self.assertEquals(note.title, self.form_data['title'])
+        self.assertEquals(note.author, self.reader)
 
     def test_anonymous_user_cant_create_note(self):
         response = self.client.post(self.add_url, data=self.form_data)
